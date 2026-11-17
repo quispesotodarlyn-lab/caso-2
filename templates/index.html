@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Costo de transporte agrícola | SENATI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+</head>
+<body>
+  <header>
+    <img src="{{ url_for('static', filename='logo_senati.png') }}" alt="SENATI">
+    <div>
+      <strong>Machine Learning y Deep Learning</strong>
+      <p>Caso práctico: regresión lineal múltiple</p>
+    </div>
+  </header>
+
+  <main>
+    <h1>¿Cuánto costará transportar la cosecha?</h1>
+    <p>Ingresa los datos del viaje y pulsa «Calcular» para obtener el costo estimado.</p>
+
+    <!-- POST envía al servidor el contenido del formulario. -->
+    <form method="POST">
+      <label for="distancia_km">Distancia del viaje (km, de {{ rangos.distancia_km[0] }} a {{ rangos.distancia_km[1] }})</label>
+      <input id="distancia_km" type="number" name="distancia_km"
+             min="{{ rangos.distancia_km[0] }}" max="{{ rangos.distancia_km[1] }}"
+             step="any" required value="{{ escritos.distancia_km }}"
+             placeholder="Por ejemplo, 25">
+
+      <label for="carga_kg">Peso de la carga (kg, de {{ rangos.carga_kg[0] }} a {{ rangos.carga_kg[1] }})</label>
+      <input id="carga_kg" type="number" name="carga_kg"
+             min="{{ rangos.carga_kg[0] }}" max="{{ rangos.carga_kg[1] }}"
+             step="any" required value="{{ escritos.carga_kg }}"
+             placeholder="Por ejemplo, 400">
+
+      <label for="via_no_asfaltada">Tipo de vía</label>
+      <select id="via_no_asfaltada" name="via_no_asfaltada">
+        <option value="0" {% if escritos.via_no_asfaltada == '0' %}selected{% endif %}>Asfaltada (0)</option>
+        <option value="1" {% if escritos.via_no_asfaltada == '1' %}selected{% endif %}>No asfaltada (1)</option>
+      </select>
+
+      <button type="submit">Calcular</button>
+    </form>
+
+    {% if resultado %}
+      <section class="resultado">
+        <p>Costo estimado del viaje</p>
+        <strong>S/ {{ resultado.costo }}</strong>
+        <small>Rango probable: S/ {{ resultado.minimo }} a S/ {{ resultado.maximo }}</small>
+      </section>
+    {% endif %}
+
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <section class="detalle">
+      <h2>Qué tan confiable es</h2>
+      <p>En los datos de prueba, el modelo se equivocó en promedio por <strong>S/ {{ '%.2f'|format(mae) }}</strong> (MAE)
+         y explicó el <strong>{{ '%.1f'|format(r2 * 100) }}%</strong> de la variación del costo (R² = {{ '%.3f'|format(r2) }}).</p>
+    </section>
+
+    <p class="aviso">Práctica con datos simulados. Es una estimación, no una cotización: el costo real puede variar por combustible, peajes, clima, estado de la vía o tarifas del transportista.</p>
+  </main>
+  <footer>Material de taller · SENATI</footer>
+</body>
+</html>
